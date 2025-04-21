@@ -27,7 +27,10 @@ tl.SetLogger(appName,"dev","file","/yourpath")
 or tl.SetLogger(appName,"dev","console","")
 
 ```
-
+### 异常注入开启
+```
+	tl.SetLogErr(true)
+```
 #### 替换gin的全局中间件
 
 ```

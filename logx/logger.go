@@ -29,11 +29,11 @@ var (
 	sugar   *zap.Logger
 )
 
-func SetLogger(name, mode, t, logPath string) {
+func SetLogger(name, mode, t, path string) {
 	appName = name
 	appMode = mode
 	logType = t
-	logPath = logPath
+	logPath = path
 }
 
 type config struct {
@@ -78,7 +78,7 @@ func getSugar() *zap.Logger {
 			cfg.appMode = "dev1"
 		}
 		if logPath == "" {
-			cfg.logPath = "/privasea/"
+			cfg.logPath = "/privasea"
 		}
 		sugar = initSugar(&cfg)
 	}
