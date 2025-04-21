@@ -5,9 +5,9 @@
 package logger
 
 import (
-	fileutil2 "facebyte/pkg/tl/logx/logger/fileutil"
-	"facebyte/pkg/tl/logx/logger/strftime"
 	"fmt"
+	fileutil2 "github.com/Privasea/tl/logx/logger/fileutil"
+	"github.com/Privasea/tl/logx/logger/strftime"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"

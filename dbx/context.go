@@ -2,8 +2,8 @@ package dbx
 
 import (
 	"context"
-	"facebyte/config"
-	"facebyte/pkg/tl/injection"
+	"github.com/Privasea/tl/injection"
+	"github.com/Privasea/tl/logx"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 	"gorm.io/gorm"
@@ -71,7 +71,7 @@ func beforeSql(tx *gorm.DB) {
 		if imei != "" {
 			injection.TrackingPoints(ctx)
 			var point = injection.GetTrackingPoint(ctx)
-			inErr, _ := injection.DealPoints(config.GetBase().AppName, ctx.Request.URL.Path, ctx.Request.Method, imei, point)
+			inErr, _ := injection.DealPoints(logx.GetConfig().AppName, ctx.Request.URL.Path, ctx.Request.Method, imei, point)
 			if inErr == "ErrRecordNotFound" {
 				tx.AddError(gorm.ErrRecordNotFound)
 			}

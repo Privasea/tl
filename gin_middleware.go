@@ -3,12 +3,11 @@ package tl
 import (
 	"bytes"
 	"encoding/json"
-	"facebyte/config"
-	"facebyte/pkg/tl/gcalx"
-	"facebyte/pkg/tl/injection"
-	"facebyte/pkg/tl/logx"
-	"facebyte/pkg/utils"
 	"fmt"
+	"github.com/Privasea/tl/gcalx"
+	"github.com/Privasea/tl/injection"
+	"github.com/Privasea/tl/logx"
+	"github.com/Privasea/tl/utils"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
@@ -84,7 +83,7 @@ func GinInterceptor(ctx *gin.Context) {
 	injection.TrackingPoints(ctx)
 	imei := ctx.GetHeader("Imei")
 	var point = injection.GetTrackingPoint(ctx)
-	mock, err := injection.DealPoints(config.GetBase().AppName, ctx.Request.URL.Path, ctx.Request.Method, imei, point)
+	mock, err := injection.DealPoints(logx.GetConfig().AppName, ctx.Request.URL.Path, ctx.Request.Method, imei, point)
 	if err != nil {
 
 		ctx.JSON(http.StatusOK, map[string]interface{}{
@@ -125,6 +124,7 @@ func GinInterceptor(ctx *gin.Context) {
 	logW := true
 	path := ctx.Request.URL.Path
 	strSlice := []string{"/"}
+
 	if utils.InArray(strSlice, path) {
 		logW = false
 	}

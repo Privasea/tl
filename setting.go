@@ -1,11 +1,11 @@
 package tl
 
 import (
-	"facebyte/pkg/tl/dbx"
-	"facebyte/pkg/tl/gcalx"
-	"facebyte/pkg/tl/injection"
-	"facebyte/pkg/tl/logx"
-	"facebyte/pkg/tl/mq"
+	"github.com/Privasea/tl/dbx"
+	"github.com/Privasea/tl/gcalx"
+	"github.com/Privasea/tl/injection"
+	"github.com/Privasea/tl/logx"
+	"github.com/Privasea/tl/mq"
 )
 
 // 必须设置项

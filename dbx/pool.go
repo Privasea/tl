@@ -6,7 +6,7 @@ package dbx
 import "gorm.io/gorm"
 
 const (
-	defaultDbName = "facebyte"
+	defaultDbName = "privasea"
 )
 
 var dbPool map[string]*gorm.DB

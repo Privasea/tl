@@ -2,8 +2,8 @@ package logx
 
 import (
 	"context"
-	"facebyte/pkg/tl/injection"
 	"fmt"
+	"github.com/Privasea/tl/injection"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm/logger"

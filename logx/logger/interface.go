@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"facebyte/pkg/tl/logx/logger/fileutil"
-	"facebyte/pkg/tl/logx/logger/strftime"
+	"github.com/Privasea/tl/logx/logger/fileutil"
+	"github.com/Privasea/tl/logx/logger/strftime"
 	"sync"
 	"time"
 )

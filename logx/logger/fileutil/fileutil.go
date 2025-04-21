@@ -1,7 +1,7 @@
 package fileutil
 
 import (
-	"facebyte/pkg/tl/logx/logger/strftime"
+	"github.com/Privasea/tl/logx/logger/strftime"
 	"time"
 )
 

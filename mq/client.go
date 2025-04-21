@@ -1,7 +1,7 @@
 package mq
 
 import (
-	"facebyte/pkg/tl/gcalx"
+	"github.com/Privasea/tl/gcalx"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"

@@ -6,7 +6,7 @@
 #### 引入tl
 
 ```
-go get https://github.com/Privasea/tl
+go get github.com/Privasea/tl
 import "github.com/Privasea/tl"
 ```
 
@@ -15,7 +15,6 @@ import "github.com/Privasea/tl"
 ```
 "env_api_log": true,
 "env_db_log": true,
-"env_sdk_log": true,
 ```
 
 #### 初始化
@@ -23,7 +22,9 @@ import "github.com/Privasea/tl"
 ```
 tl.SetParamLog(env_api_log)
 tl.SetDbLog(env_db_log)
-tl.SetLogger(appName,"dev","file")
+
+tl.SetLogger(appName,"dev","file","/yourpath") 
+or tl.SetLogger(appName,"dev","console","")
 
 ```
 

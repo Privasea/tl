@@ -3,8 +3,8 @@
 package logx
 
 import (
-	"facebyte/pkg/tl/logx/logger"
 	"fmt"
+	"github.com/Privasea/tl/logx/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"io"
@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	envLogPath       = "/Users/zhangjiulin/facebytelog/"
 	defaultChildPath = "file-%Y-%m-%d.log" // 默认子目录
 
 	LevelInfo  = "info"
@@ -26,13 +25,15 @@ var (
 	appName string
 	appMode string
 	logType string
+	logPath string
 	sugar   *zap.Logger
 )
 
-func SetLogger(name, mode, t string) {
+func SetLogger(name, mode, t, logPath string) {
 	appName = name
 	appMode = mode
 	logType = t
+	logPath = logPath
 }
 
 type config struct {
@@ -42,6 +43,23 @@ type config struct {
 	logPath   string // 日志主路径
 	childPath string // 日志子路径+文件名
 }
+type config2 struct {
+	AppName   string // 应用名
+	AppMode   string // 应用环境
+	LogType   string // 日志类型
+	LogPath   string // 日志主路径
+	ChildPath string // 日志子路径+文件名
+}
+
+func GetConfig() *config2 {
+	return &config2{
+		AppName:   appName,
+		AppMode:   appMode,
+		LogType:   logType,
+		LogPath:   logPath,
+		ChildPath: defaultChildPath,
+	}
+}
 
 func getSugar() *zap.Logger {
 	if sugar == nil {
@@ -49,7 +67,7 @@ func getSugar() *zap.Logger {
 			appName:   appName,
 			appMode:   appMode,
 			logType:   logType,
-			logPath:   envLogPath,
+			logPath:   logPath,
 			childPath: defaultChildPath,
 		}
 
@@ -59,7 +77,9 @@ func getSugar() *zap.Logger {
 		if appMode == "" {
 			cfg.appMode = "dev1"
 		}
-
+		if logPath == "" {
+			cfg.logPath = "/privasea/"
+		}
 		sugar = initSugar(&cfg)
 	}
 

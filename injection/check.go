@@ -2,7 +2,7 @@ package injection
 
 import (
 	"encoding/json"
-	"facebyte/internal/errors"
+	"github.com/pkg/errors"
 )
 
 // RequestData 定义了请求数据的结构体
@@ -61,7 +61,7 @@ func GetApiDataForInject(server, path, method, imei string) ([]LogItem, error) {
 			return nil, err
 		}
 		if response.Code != 0 {
-			return nil, errors.New(1000, response.Msg)
+			return nil, errors.New(response.Msg)
 		}
 		return response.Data.List, nil
 	}

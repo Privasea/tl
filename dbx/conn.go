@@ -1,7 +1,7 @@
 package dbx
 
 import (
-	"facebyte/pkg/tl/logx"
+	"github.com/Privasea/tl/logx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var defaultDatabase = "facebyte"
+var defaultDatabase = "privasea"
 
 var defaultPoolMaxOpen = runtime.NumCPU()*2 + 5 // 连接池最大连接数量4c*2+4只读副本+1主实例
 

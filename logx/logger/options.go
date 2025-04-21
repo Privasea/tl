@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"facebyte/pkg/tl/logx/logger/option"
+	"github.com/Privasea/tl/logx/logger/option"
 	"time"
 )
 
