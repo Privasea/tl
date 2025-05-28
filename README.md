@@ -13,8 +13,11 @@ import "github.com/Privasea/tl"
 #### 增加配置
 
 ```
-"env_api_log": true,
-"env_db_log": true,
+"env_api_log": true,//开启apilog，默认开启
+"env_db_log": true,//开启dblog，默认开启
+"env_dbw_log": true,//开启dblog,写操作，默认开启
+"env_dbr_log": true,//开启dblog，读操作,默认开启
+"env_debug_log": true,//开启debuglog，默认开启
 ```
 
 #### 初始化
@@ -22,6 +25,9 @@ import "github.com/Privasea/tl"
 ```
 tl.SetParamLog(env_api_log)
 tl.SetDbLog(env_db_log)
+tl.SetDbWLog(env_db_log)
+tl.SetDbRLog(env_db_log)
+tl.SetDebugLog(env_db_log)
 
 tl.SetLogger(appName,"dev","file","/yourpath") 
 or tl.SetLogger(appName,"dev","console","")

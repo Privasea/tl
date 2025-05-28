@@ -11,6 +11,9 @@ import (
 // 必须设置项
 var SetLogger = logx.SetLogger
 var SetDbLog = logx.SetDbLog
+var SetDbWLog = logx.SetDbWLog
+var SetDbRLog = logx.SetDbRLog
+var SetDebugLog = logx.SetDebugLog
 var SetLogErr = injection.SetLogErr
 var SetParamLog = setParamLog
 var SetSdkLog = gcalx.SetSdkLog

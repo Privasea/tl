@@ -8,10 +8,13 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/utils"
+	"strings"
 	"time"
 )
 
 var dl = true
+var dlw = true
+var dlr = true
 
 const (
 	normalSql = "normal"
@@ -145,18 +148,36 @@ func gormWriter(ctx context.Context, level string, rows int64, sql, slowLog, lin
 		zap.Any("end_time", float64(end.UnixNano())/1e9),
 		zap.String("runtime", runTime),
 	)
+	//关闭所有sql日志
+	if !dl {
+		return
+	}
+	//区分读和写操作的
+	if containsSelect(sql) {
+		//关闭读操作日志
+		if !dlr {
+			return
+		}
+	} else {
+		//关闭写操作日志
+		if !dlw {
+			return
+		}
+	}
 
 	switch level {
 	case LevelInfo:
-		if dl {
-			getSugar().Info(msg, fields...)
-		}
+
+		getSugar().Info(msg, fields...)
+
 	case LevelWarn:
-		if dl {
-			getSugar().Warn(msg, fields...)
-		}
+
+		getSugar().Warn(msg, fields...)
+
 	case LevelError:
+
 		getSugar().Error(msg, fields...)
+
 	}
 
 	return
@@ -174,4 +195,14 @@ type gormRequestLog struct {
 
 func SetDbLog(v bool) {
 	dl = v
+}
+func SetDbWLog(v bool) {
+	dlw = v
+}
+func SetDbRLog(v bool) {
+	dlr = v
+}
+func containsSelect(sql string) bool {
+	sql = strings.ToLower(sql) // 转换为小写
+	return strings.Contains(sql, "select")
 }
