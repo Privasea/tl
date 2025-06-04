@@ -49,7 +49,8 @@ r.Use(tl.GinInterceptor)
 ```
 // 替换原来的数据库连接池
 tl.InitConn(数据库名, 连接dsn)
-
+// 主从支持
+tl.InitConn(数据库名, 主库dsn, 从库dsn...)
 // 获取一个连接
 func Orm(ctx *gin.Context) *gorm.DB {
 db := tl.WarpMysql(ctx, 数据库名)

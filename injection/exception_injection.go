@@ -1,6 +1,7 @@
 package injection
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"time"
@@ -21,15 +22,18 @@ func TrackingPoints(ctx *gin.Context) {
 	}
 
 }
-func GetTrackingPoint(ctx *gin.Context) string {
+func GetTrackingPoint(ctx context.Context) string {
 	var trackingPoint string
-	if ctx.Request == nil {
-		return ""
+	if ginCtx, ok := ctx.(*gin.Context); ok {
+		if ginCtx.Request == nil {
+			return ""
+		}
+		trackingPoint = ginCtx.GetString("tracking_points")
+		if trackingPoint == "" {
+			trackingPoint = ginCtx.GetHeader("tracking_points")
+		}
 	}
-	trackingPoint = ctx.GetString("tracking_points")
-	if trackingPoint == "" {
-		trackingPoint = ctx.GetHeader("tracking_points")
-	}
+
 	return trackingPoint
 }
 func GetMatchPoints(server, path, method, imei, trackingPoints string) (LogItem, error) {

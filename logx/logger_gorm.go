@@ -118,6 +118,7 @@ func gormWriter(ctx context.Context, level string, rows int64, sql, slowLog, lin
 	if requestId == "" {
 		requestId = "null"
 	}
+	
 	database, ok := ctx.Value("gorm:database").(string)
 	if !ok {
 		database = "null"
