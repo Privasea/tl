@@ -19,9 +19,13 @@ import (
 )
 
 var paramLog = true
+var NoParamLogUrlPath []string
 
 func setParamLog(v bool) {
 	paramLog = v
+}
+func SetNoParamLogByUrlPath(urlPath []string) {
+	NoParamLogUrlPath = urlPath
 }
 
 // 判断请求是否为 multipart/form-data 类型
@@ -128,8 +132,8 @@ func GinInterceptor(ctx *gin.Context) {
 	if utils.InArray(strSlice, path) {
 		logW = false
 	}
-
-	if paramLog && logW {
+	bool := containsString(NoParamLogUrlPath, path) // 不在不需要记录的路由中的接口，才记录
+	if paramLog && logW && bool == false {
 		endTime := time.Now()
 		elapsed := endTime.Sub(startTime)
 		runTime := fmt.Sprintf("%.3fms", float64(elapsed.Nanoseconds())/1e6)
@@ -151,6 +155,14 @@ func GinInterceptor(ctx *gin.Context) {
 			zap.String("runtime", runTime),
 		)
 	}
+}
+func containsString(slice []string, target string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+	_, ok := set[target]
+	return ok
 }
 
 // GinInterceptor 记录框架出入参, 开启链路追踪

@@ -6,7 +6,7 @@
 #### 引入tl
 
 ```
-go get github.com/Privasea/tl@v1.0.1
+go get github.com/Privasea/tl@ v1.0.6
 import "github.com/Privasea/tl"
 ```
 
@@ -24,6 +24,7 @@ import "github.com/Privasea/tl"
 
 ```
 tl.SetParamLog(env_api_log)
+tl.SetNoParamLogByUrlPath([]string{"/api/v1/sign/node/get_node_info"})  //不需要记录日志的接口这里设置
 tl.SetDbLog(env_db_log)
 tl.SetDbWLog(env_db_log)
 tl.SetDbRLog(env_db_log)
