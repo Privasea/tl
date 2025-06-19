@@ -6,7 +6,7 @@
 #### 引入tl
 
 ```
-go get github.com/Privasea/tl
+go get github.com/Privasea/tl@v1.0.1
 import "github.com/Privasea/tl"
 ```
 
