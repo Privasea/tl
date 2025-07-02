@@ -46,6 +46,7 @@ var timeoutConfig = TimeoutConfig{
 	Enabled:   false,
 	Threshold: 6 * time.Second, // 默认6秒
 	RedisName: "default",
+	FeishuURL: "",
 }
 
 // SetTimeoutConfig 设置超时配置
