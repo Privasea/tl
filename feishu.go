@@ -24,7 +24,7 @@ type FeishuText struct {
 
 // 发送通知到飞书
 func SendToFeishu(feishuUrl string,appName string,appEnv string,msg string,data string,errMsg string) (err error) {
-	fmt.Sprintf(feishuUrl,appName,appEnv,msg,data,errMsg)
+	fmt.Println(feishuUrl,appName,appEnv,msg,data,errMsg)
 	//发送的内容
 	feishuText := FeishuText{
 		AppName: appName,
@@ -65,9 +65,10 @@ func SendToFeishu(feishuUrl string,appName string,appEnv string,msg string,data 
 	}
 	defer resp.Body.Close()
 	// 读取响应体
-	/*_, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}*/
+	//_, err = io.ReadAll(resp.Body)
+	//if err != nil {
+	//	return
+	//}
+	fmt.Println("resp:",resp)
 	return nil
 }
