@@ -1,11 +1,10 @@
 package redix
 
 import (
-"context"
-	"fmt"
+	"context"
 	"github.com/go-redis/redis/v8"
-"log"
-"sync"
+	"log"
+	"sync"
 )
 
 var (
