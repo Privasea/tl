@@ -6,7 +6,26 @@ import (
 	"github.com/Privasea/tl/injection"
 	"github.com/Privasea/tl/logx"
 	"github.com/Privasea/tl/mq"
+	"github.com/Privasea/tl/redix"
+	"time"
 )
+
+// TimeoutConfig 超时配置
+type TimeoutConfig struct {
+	Enabled      bool          // 是否启用超时告警
+	Threshold    time.Duration // 超时阈值
+	FEISHUURL  string        // 钉钉webhook URL
+}
+
+var timeoutConfig = TimeoutConfig{
+	Enabled:   false,
+	Threshold: 6 * time.Second, // 默认6秒
+}
+
+// SetTimeoutConfig 设置超时配置
+func SetTimeoutConfig(config TimeoutConfig) {
+	timeoutConfig = config
+}
 
 // 必须设置项
 var SetLogger = logx.SetLogger
@@ -37,6 +56,10 @@ var WithContext = gcalx.DefaultClient().WithITrace
 // 数据库
 var InitConn = dbx.InitConn
 var WarpMysql = dbx.Wrap
+
+// Redis相关
+var InitRedis = redix.InitConn
+var WrapRedis = redix.Wrap
 
 // mq
 var NewMqClient = mq.NewMqClient

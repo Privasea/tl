@@ -125,6 +125,38 @@ func GinInterceptor(ctx *gin.Context) {
 
 	ctx.Next()
 
+	endTime := time.Now()
+	elapsed := endTime.Sub(startTime)
+	runTime := fmt.Sprintf("%.3fms", float64(elapsed.Nanoseconds())/1e6)
+
+	// 检查是否超时
+	if timeoutConfig.Enabled && elapsed > timeoutConfig.Threshold {
+		// 获取 Redis 客户端并检查是否需要发送告警
+		if redis := WrapRedis(ctx, "default"); redis != nil {
+			key := "alarm:timeout:" + ctx.Request.URL.Path
+			// 尝试设置告警标记，5分钟内不重复
+			if ok, _ := redis.SetNX(ctx, key, 1, 5*time.Minute).Result(); ok {
+				go func() {
+					msg := fmt.Sprintf("接口超时告警\n"+
+						"- 请求路径：%s\n"+
+						"- 请求方法：%s\n"+
+						"- 执行时间：%s\n"+
+						"- 客户端IP：%s\n"+
+						"- 请求参数：%v\n"+
+						"- 响应结果：%v",
+						ctx.Request.URL.Path,
+						ctx.Request.Method,
+						runTime,
+						ctx.ClientIP(),
+						request.Body,
+						rpl)
+
+					SendToFeishu(timeoutConfig.FEISHUURL, "接口请求超时", msg, "no")
+				}()
+			}
+		}
+	}
+
 	logW := true
 	path := ctx.Request.URL.Path
 	strSlice := []string{"/"}

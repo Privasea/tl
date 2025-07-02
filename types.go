@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
+	"time"
 )
 
 const (
@@ -31,4 +32,40 @@ func GetNewGinContext() *gin.Context {
 	ctx.Set(xB3Key, uid)
 	ctx.Set(requestIdKey, uid)
 	return ctx
+}
+
+// TimeoutConfig 超时配置
+type TimeoutConfig struct {
+	Enabled   bool          // 是否启用超时告警
+	Threshold time.Duration // 超时阈值（例如：6 * time.Second）
+	FeishuURL string        // 飞书webhook URL
+	RedisName string        // Redis实例名称，默认为"default"
+}
+
+var timeoutConfig = TimeoutConfig{
+	Enabled:   false,
+	Threshold: 6 * time.Second, // 默认6秒
+	RedisName: "default",
+}
+
+// SetTimeoutConfig 设置超时配置
+func SetTimeoutConfig(config TimeoutConfig) {
+	timeoutConfig = config
+}
+
+// GetTimeoutConfig 获取当前超时配置
+func GetTimeoutConfig() TimeoutConfig {
+	return timeoutConfig
+}
+
+// EnableTimeout 启用超时告警
+func EnableTimeout(threshold time.Duration, feishuURL string) {
+	timeoutConfig.Enabled = true
+	timeoutConfig.Threshold = threshold
+	timeoutConfig.FeishuURL = feishuURL
+}
+
+// DisableTimeout 禁用超时告警
+func DisableTimeout() {
+	timeoutConfig.Enabled = false
 }
