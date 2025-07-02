@@ -22,9 +22,11 @@ type FeishuText struct {
 }
 
 // 发送通知到飞书
-func SendToFeishu(feishuUrl string,msg string, data string, errMsg string) (err error) {
+func SendToFeishu(feishuUrl string,appName string,appEnv string,msg string, data string, errMsg string) (err error) {
 	//发送的内容
 	feishuText := FeishuText{
+		AppName: appName,
+		AppEnv:  appEnv, // 环境
 		Msg:     msg,
 		Data:    data,
 		ErrMsg:  errMsg,

@@ -39,6 +39,8 @@ type TimeoutConfig struct {
 	Enabled   bool          // 是否启用超时告警
 	Threshold time.Duration // 超时阈值（例如：6 * time.Second）
 	FeishuURL string        // 飞书webhook URL
+	AppName string
+	AppEnv string
 	RedisName string        // Redis实例名称，默认为"default"
 }
 
@@ -47,6 +49,8 @@ var timeoutConfig = TimeoutConfig{
 	Threshold: 6 * time.Second, // 默认6秒
 	RedisName: "default",
 	FeishuURL: "",
+	AppName: "test",
+	AppEnv: "dev",
 }
 
 // SetTimeoutConfig 设置超时配置
