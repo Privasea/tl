@@ -3,7 +3,6 @@ package tl
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -24,7 +23,6 @@ type FeishuText struct {
 
 // 发送通知到飞书
 func SendToFeishu(feishuUrl string,appName string,appEnv string,msg string,data string,errMsg string) (err error) {
-	fmt.Println(feishuUrl,appName,appEnv,msg,data,errMsg)
 	//发送的内容
 	feishuText := FeishuText{
 		AppName: appName,
@@ -57,10 +55,8 @@ func SendToFeishu(feishuUrl string,appName string,appEnv string,msg string,data 
 	req.Header.Set("Content-Type", "application/json")
 	// 发送请求
 	client := &http.Client{}
-	fmt.Println(req)
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	defer resp.Body.Close()
@@ -69,6 +65,5 @@ func SendToFeishu(feishuUrl string,appName string,appEnv string,msg string,data 
 	//if err != nil {
 	//	return
 	//}
-	fmt.Println("resp:",resp)
 	return nil
 }

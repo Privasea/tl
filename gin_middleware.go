@@ -150,7 +150,6 @@ func GinInterceptor(ctx *gin.Context) {
 						ctx.ClientIP(),
 						request.Body,
 						rpl)
-					fmt.Println("超时警告")
 					SendToFeishu(timeoutConfig.FeishuURL, timeoutConfig.AppName,timeoutConfig.AppEnv,"接口请求超时", msg, "no")
 				}()
 			}
