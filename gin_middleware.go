@@ -168,14 +168,21 @@ func GinInterceptor(ctx *gin.Context) {
 			if ok, _ := redis.SetNX(ctx, key, 1, 5*time.Minute).Result(); ok {
 				fmt.Sprintln("send")
 				go func() {
-					msg := fmt.Sprintf("%s\n"+
-						"- 告警原因：%s\n"+
-						"- 请求路径：%s\n"+
-						"- 请求方法：%s\n"+
-						"- 执行时间：%s\n"+
-						"- 客户端IP：%s\n"+
-						"- 请求参数：%v\n"+
-						"- 响应结果：%s",
+					var out interface{}
+					err := json.NewDecoder(w.body).Decode(&out)
+					if err != nil {
+						rpl = w.body.String()
+					} else {
+						rpl = out
+					}
+					msg := fmt.Sprintf("%s "+
+						"- 告警原因：%s "+
+						"- 请求路径：%s "+
+						"- 请求方法：%s "+
+						"- 执行时间：%s "+
+						"- 客户端IP：%s "+
+						"- 请求参数：%v "+
+						"- 响应结果：%s ",
 						alertType,
 						alertReason,
 						ctx.Request.URL.Path,
@@ -183,7 +190,7 @@ func GinInterceptor(ctx *gin.Context) {
 						runTime,
 						ctx.ClientIP(),
 						request.Body,
-						w.body.String())
+						rpl)
 
 					SendToFeishu(alertConfig.FeishuURL, alertConfig.AppName,alertConfig.AppEnv,alertType, msg, "no")
 				}()
