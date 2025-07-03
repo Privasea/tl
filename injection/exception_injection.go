@@ -24,7 +24,6 @@ type PressureType string
 const (
 	PressureCPU    PressureType = "cpu"    // CPU压力
 	PressureMemory PressureType = "memory" // 内存压力
-	PressureDB     PressureType = "db"     // 数据库压力
 )
 
 // 系统级压力控制器
@@ -115,8 +114,6 @@ func (pc *SystemPressureController) applyPressure(pType PressureType) {
 		pc.applyCPUPressure()
 	case PressureMemory:
 		pc.applyMemoryPressure()
-	case PressureDB:
-		pc.applyDBPressure()
 	}
 }
 
@@ -148,41 +145,69 @@ func (pc *SystemPressureController) applyMemoryPressure() {
 	// 计算要分配的内存大小（以MB为单位）
 	memorySize := pressure.level * 100 // 每个等级分配100MB
 
-	var memoryBlocks [][]byte
+	// 使用通道来保持对内存块的引用
+	memChan := make(chan []byte, memorySize)
 
 	go func() {
-		for i := 0; i < memorySize && pc.pressures[PressureMemory].active; i++ {
-			// 分配1MB内存
-			block := make([]byte, 1024*1024)
-			memoryBlocks = append(memoryBlocks, block)
-			time.Sleep(100 * time.Millisecond)
-		}
+		// 创建定时器用于监控内存使用情况
+		ticker := time.NewTicker(time.Second)
+		defer ticker.Stop()
 
-		// 等待持续时间后释放内存
-		time.Sleep(pressure.duration)
-		memoryBlocks = nil
-		runtime.GC()
-	}()
-}
-
-// 数据库压力模拟
-func (pc *SystemPressureController) applyDBPressure() {
-	pressure := pc.pressures[PressureDB]
-
-	// 模拟数据库连接池压力
-	go func() {
 		start := time.Now()
-		for time.Since(start) < pressure.duration {
-			// 模拟数据库连接延迟
-			time.Sleep(time.Duration(pressure.level) * time.Millisecond)
+		allocated := 0
+
+		for allocated < memorySize {
+			// 分配1MB内存并写入数据以确保实际使用
+			block := make([]byte, 1024*1024)
+			for i := range block {
+				block[i] = byte(i % 256)
+			}
+
+			// 将内存块放入通道，保持引用
+			select {
+			case memChan <- block:
+				allocated++
+
+				// 打印当前内存使用情况
+				var m runtime.MemStats
+				runtime.ReadMemStats(&m)
+				fmt.Printf("Memory pressure - Allocated: %dMB, Total: %dMB\n",
+					allocated, m.Alloc/1024/1024)
+
+			default:
+				// 通道满了就等待一下
+				time.Sleep(100 * time.Millisecond)
+			}
+
+			// 检查是否达到持续时间
+			if time.Since(start) >= pressure.duration {
+				break
+			}
 		}
+
+		// 等待持续时间结束
+		time.Sleep(pressure.duration)
+
+		// 清理内存
+		for len(memChan) > 0 {
+			<-memChan
+		}
+		close(memChan)
+		runtime.GC()
+
+		// 更新状态
+		pc.mu.Lock()
+		if p, exists := pc.pressures[PressureMemory]; exists {
+			p.active = false
+		}
+		pc.mu.Unlock()
 	}()
 }
 
 // 修改DealPoints函数以支持压力注入
 func DealPoints(server, path, method, imei, trackingPoints string) (string, error) {
 	pointData, err := GetMatchPoints(server, path, method, imei, trackingPoints)
-	fmt.Println("ppp",pointData)
+	fmt.Println("pointData", pointData)
 	if err != nil {
 		return "", err
 	}
@@ -216,41 +241,8 @@ func DealPoints(server, path, method, imei, trackingPoints string) (string, erro
 			level, _ := strconv.Atoi(params[1])          //压力等级:80%
 			duration, _ := time.ParseDuration(params[2]) //持续时间
 
-			// 判断是否是接口级注入
-			if strings.HasPrefix(params[0], "api_") {
-				// 接口级压力注入
-				switch pType {
-				case "api_cpu":
-					// 只在当前请求中模拟CPU压力
-					go func() {
-						start := time.Now()
-						for time.Since(start) < duration {
-							// 执行密集计算
-							for j := 0; j < 1000000; j++ {
-								_ = j * j
-							}
-						}
-					}()
-				case "api_memory":
-					// 为当前请求分配额外内存并确保其被使用
-					memory := make([]byte, level*1024*1024)
-					// 写入一些数据以确保内存被实际使用
-					for i := 0; i < len(memory); i += 1024 {
-						memory[i] = byte(i % 256)
-					}
-					defer func() {
-						// 确保在函数返回前内存不会被提前回收
-						runtime.KeepAlive(memory)
-						memory = nil
-					}()
-				case "api_db":
-					// 模拟当前请求的数据库延迟
-					time.Sleep(time.Duration(level) * time.Millisecond)
-				}
-			} else {
-				// 系统级压力注入
-				globalController.InjectPressure(pType, level, duration)
-			}
+			// 系统级压力注入
+			globalController.InjectPressure(pType, level, duration)
 		}
 	}
 	return "", nil
