@@ -171,8 +171,6 @@ func (pc *SystemPressureController) applyMemoryPressure() {
 				// 打印当前内存使用情况
 				var m runtime.MemStats
 				runtime.ReadMemStats(&m)
-				fmt.Printf("Memory pressure - Allocated: %dMB, Total: %dMB\n",
-					allocated, m.Alloc/1024/1024)
 
 			default:
 				// 通道满了就等待一下
