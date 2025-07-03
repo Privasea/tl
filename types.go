@@ -41,13 +41,11 @@ type TimeoutConfig struct {
 	FeishuURL string        // 飞书webhook URL
 	AppName string
 	AppEnv string
-	RedisName string        // Redis实例名称，默认为"default"
 }
 
 var timeoutConfig = TimeoutConfig{
 	Enabled:   false,
 	Threshold: 6 * time.Second, // 默认6秒
-	RedisName: "default",
 	FeishuURL: "",
 	AppName: "test",
 	AppEnv: "dev",
