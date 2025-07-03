@@ -128,29 +128,63 @@ func GinInterceptor(ctx *gin.Context) {
 	endTime := time.Now()
 	elapsed := endTime.Sub(startTime)
 	runTime := fmt.Sprintf("%.3fms", float64(elapsed.Nanoseconds())/1e6)
+	// 检查是否需要告警
+	shouldAlertTimeout := false
+	shouldAlertError := false
+	alertType := ""
+	alertReason := ""
 
-	// 检查是否超时
-	if timeoutConfig.Enabled && elapsed > timeoutConfig.Threshold {
+	// 1. 检查超时
+	if alertConfig.TimeoutEnabled && elapsed > alertConfig.Threshold {
+		shouldAlertTimeout = true
+		alertType = "接口超时告警"
+		alertReason = fmt.Sprintf("执行时间: %s, 超过阈值: %v", runTime, alertConfig.Threshold)
+	}
+	// 2. 检查HTTP状态码和业务状态码
+	if alertConfig.ErrorEnabled && !containsString(alertConfig.IgnorePaths, ctx.Request.URL.Path) {
+		statusCode := ctx.Writer.Status()
+		if statusCode != http.StatusOK {
+			shouldAlertError = true
+			alertType = "接口状态码异常"
+			alertReason = fmt.Sprintf("HTTP状态码: %d", statusCode)
+		} else {
+			// 尝试解析响应体
+			var resp Response
+			if err := json.Unmarshal(w.body.Bytes(), &resp); err == nil {
+				if resp.Code != 0 {
+					shouldAlertError = true
+					alertType = "接口业务异常"
+					alertReason = fmt.Sprintf("业务码: %d, 错误信息: %s", resp.Code, resp.Msg)
+				}
+			}
+		}
+	}
+	// 发送告警-异常情况只发生一次
+	if shouldAlertTimeout || shouldAlertError {
 		// 获取 Redis 客户端并检查是否需要发送告警
-		if redis := WrapRedis(ctx, "default"); redis != nil {
-			key := "alarm:timeout:" + ctx.Request.URL.Path
+		if redis := WrapRedis(ctx, alertConfig.RedisName); redis != nil {
+			key := fmt.Sprintf("alarm:%s:%s", alertType, ctx.Request.URL.Path)
 			// 尝试设置告警标记，5分钟内不重复
 			if ok, _ := redis.SetNX(ctx, key, 1, 5*time.Minute).Result(); ok {
 				go func() {
-					msg := fmt.Sprintf("接口超时告警\n"+
+					msg := fmt.Sprintf("%s\n"+
+						"- 告警原因：%s\n"+
 						"- 请求路径：%s\n"+
 						"- 请求方法：%s\n"+
 						"- 执行时间：%s\n"+
 						"- 客户端IP：%s\n"+
 						"- 请求参数：%v\n"+
-						"- 响应结果：%v",
+						"- 响应结果：%s",
+						alertType,
+						alertReason,
 						ctx.Request.URL.Path,
 						ctx.Request.Method,
 						runTime,
 						ctx.ClientIP(),
 						request.Body,
-						rpl)
-					SendToFeishu(timeoutConfig.FeishuURL, timeoutConfig.AppName,timeoutConfig.AppEnv,"接口请求超时", msg, "no")
+						w.body.String())
+
+					SendToFeishu(alertConfig.FeishuURL, alertConfig.AppName,alertConfig.AppEnv,alertType, msg, "no")
 				}()
 			}
 		}

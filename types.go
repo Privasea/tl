@@ -34,41 +34,58 @@ func GetNewGinContext() *gin.Context {
 	return ctx
 }
 
-// TimeoutConfig 超时配置
-type TimeoutConfig struct {
-	Enabled   bool          // 是否启用超时告警
-	Threshold time.Duration // 超时阈值（例如：6 * time.Second）
-	FeishuURL string        // 飞书webhook URL
+// Response 通用响应结构
+type Response struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
+}
+
+// AlertConfig
+type AlertConfig struct {
+	//环境
 	AppName string
-	AppEnv string
+	AppEnv  string
+	// 超时告警配置
+	TimeoutEnabled bool          // 是否启用超时告警
+	Threshold      time.Duration // 超时阈值
+
+	// 错误告警配置
+	ErrorEnabled bool     // 是否启用错误告警
+	IgnorePaths  []string // 忽略告警的路径列表
+
+	// 通用配置
+	FeishuURL string // 飞书webhook URL
+	RedisName string // Redis实例名称
 }
 
-var timeoutConfig = TimeoutConfig{
-	Enabled:   false,
-	Threshold: 6 * time.Second, // 默认6秒
-	FeishuURL: "",
-	AppName: "test",
-	AppEnv: "dev",
+// 默认配置
+var alertConfig = AlertConfig{
+	TimeoutEnabled: false,
+	Threshold:      6 * time.Second,
+	ErrorEnabled:   false,
+	IgnorePaths:    []string{},
+	RedisName:      "default",
 }
 
-// SetTimeoutConfig 设置超时配置
-func SetTimeoutConfig(config TimeoutConfig) {
-	timeoutConfig = config
+// SetAlertConfig
+func SetAlertConfig(config AlertConfig) {
+	alertConfig = config
 }
 
-// GetTimeoutConfig 获取当前超时配置
-func GetTimeoutConfig() TimeoutConfig {
-	return timeoutConfig
+// GetAlertConfig
+func GetAlertConfig() AlertConfig {
+	return alertConfig
 }
 
-// EnableTimeout 启用超时告警
-func EnableTimeout(threshold time.Duration, feishuURL string) {
-	timeoutConfig.Enabled = true
-	timeoutConfig.Threshold = threshold
-	timeoutConfig.FeishuURL = feishuURL
+func EnableAlertConfig(threshold time.Duration, feishuURL string) {
+	alertConfig.TimeoutEnabled = true
+	alertConfig.ErrorEnabled = true
+	alertConfig.Threshold = threshold
+	alertConfig.FeishuURL = feishuURL
 }
 
-// DisableTimeout 禁用超时告警
-func DisableTimeout() {
-	timeoutConfig.Enabled = false
+func DisableAlter() {
+	alertConfig.TimeoutEnabled = false
+	alertConfig.ErrorEnabled = false
 }
