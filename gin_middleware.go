@@ -166,7 +166,6 @@ func GinInterceptor(ctx *gin.Context) {
 			key := fmt.Sprintf("alarm:%s:%s", alertType, ctx.Request.URL.Path)
 			// 尝试设置告警标记，5分钟内不重复
 			if ok, _ := redis.SetNX(ctx, key, 1, 5*time.Minute).Result(); ok {
-				fmt.Sprintln("send")
 				go func() {
 					var out interface{}
 					err := json.NewDecoder(w.body).Decode(&out)
