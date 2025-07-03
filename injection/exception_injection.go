@@ -230,9 +230,17 @@ func DealPoints(server, path, method, imei, trackingPoints string) (string, erro
 						}
 					}()
 				case "api_memory":
-					// 为当前请求分配额外内存
+					// 为当前请求分配额外内存并确保其被使用
 					memory := make([]byte, level*1024*1024)
-					defer func() { memory = nil }()
+					// 写入一些数据以确保内存被实际使用
+					for i := 0; i < len(memory); i += 1024 {
+						memory[i] = byte(i % 256)
+					}
+					defer func() {
+						// 确保在函数返回前内存不会被提前回收
+						runtime.KeepAlive(memory)
+						memory = nil
+					}()
 				case "api_db":
 					// 模拟当前请求的数据库延迟
 					time.Sleep(time.Duration(level) * time.Millisecond)
