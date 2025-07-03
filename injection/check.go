@@ -39,8 +39,8 @@ type LogItem struct {
 
 func GetApiDataForInject(server, path, method, imei string) ([]LogItem, error) {
 	if dl {
-		//client := NewClient("http://34.13.77.118/api/v1/inner_use")
-		client := NewClient("http://exception-service:5000/api/v1/inner_use")
+		client := NewClient("https://api-dev.privasea.ai/cloud-plat/api/v1/inner_use")
+		//client := NewClient("http://exception-service:5000/api/v1/inner_use")
 
 		req := GetApiDataForInjectRequestData{
 			Server: server,
