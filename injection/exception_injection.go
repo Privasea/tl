@@ -2,6 +2,7 @@ package injection
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"runtime"
@@ -181,6 +182,7 @@ func (pc *SystemPressureController) applyDBPressure() {
 // 修改DealPoints函数以支持压力注入
 func DealPoints(server, path, method, imei, trackingPoints string) (string, error) {
 	pointData, err := GetMatchPoints(server, path, method, imei, trackingPoints)
+	fmt.Println("ppp",pointData)
 	if err != nil {
 		return "", err
 	}
