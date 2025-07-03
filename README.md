@@ -33,7 +33,22 @@ tl.SetDebugLog(env_db_log)
 tl.SetLogger(appName,"dev","file","/yourpath") 
 or tl.SetLogger(appName,"dev","console","")
 
+tl.SetAlertConfig(tl.AlertConfig{   //设置监听告警
+    TimeoutEnabled:   true, //超时监听
+    ErrorEnabled: true, //接口报错监听
+    Threshold: 6 * time.Second,  // 6秒超时
+    FeishuURL: "",
+    AppName: "nod_msg",
+    AppEnv: "dev",
+    RedisName: "default",
+    IgnorePaths: []string{"/api/v1/sign/node/get_node_info"}, // 忽略接口报错告警的路径列表
+})
 ```
+### 监听告警配合redis
+```
+    tl.InitRedis("default",rdb) //复用redis客户端
+```
+
 ### 异常注入开启
 ```
 	tl.SetLogErr(true)
