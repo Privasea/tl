@@ -137,7 +137,7 @@ func GinInterceptor(ctx *gin.Context) {
 	// 1. 检查超时
 	if alertConfig.TimeoutEnabled && elapsed > alertConfig.Threshold {
 		shouldAlertTimeout = true
-		alertType = "接口超时告警"
+		alertType = "timeout"
 		alertReason = fmt.Sprintf("执行时间: %s, 超过阈值: %v", runTime, alertConfig.Threshold)
 	}
 	// 2. 检查HTTP状态码和业务状态码
@@ -145,7 +145,7 @@ func GinInterceptor(ctx *gin.Context) {
 		statusCode := ctx.Writer.Status()
 		if statusCode != http.StatusOK {
 			shouldAlertError = true
-			alertType = "接口状态码异常"
+			alertType = "status_err"
 			alertReason = fmt.Sprintf("HTTP状态码: %d", statusCode)
 		} else {
 			// 尝试解析响应体
@@ -153,7 +153,7 @@ func GinInterceptor(ctx *gin.Context) {
 			if err := json.Unmarshal(w.body.Bytes(), &resp); err == nil {
 				if resp.Code != 0 {
 					shouldAlertError = true
-					alertType = "接口业务异常"
+					alertType = "code_err"
 					alertReason = fmt.Sprintf("业务码: %d, 错误信息: %s", resp.Code, resp.Msg)
 				}
 			}
@@ -166,6 +166,7 @@ func GinInterceptor(ctx *gin.Context) {
 			key := fmt.Sprintf("alarm:%s:%s", alertType, ctx.Request.URL.Path)
 			// 尝试设置告警标记，5分钟内不重复
 			if ok, _ := redis.SetNX(ctx, key, 1, 5*time.Minute).Result(); ok {
+				fmt.Sprintln("send")
 				go func() {
 					msg := fmt.Sprintf("%s\n"+
 						"- 告警原因：%s\n"+
