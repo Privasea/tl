@@ -9,7 +9,6 @@ import (
 	"github.com/Privasea/tl/logx"
 	"github.com/Privasea/tl/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 	uuid "github.com/satori/go.uuid"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -36,7 +35,7 @@ func isMultipartFormData(r *http.Request) bool {
 }
 
 // GinInterceptor 记录框架出入参, 开启链路追踪
-func GinInterceptor(ctx *gin.Context, redisClient *redis.Client) {
+func GinInterceptor(ctx *gin.Context) {
 
 	startTime := time.Now()
 	//记录是否经过此中间件，用于判定后面需要从请求头取数据
@@ -133,7 +132,7 @@ func GinInterceptor(ctx *gin.Context, redisClient *redis.Client) {
 	// 检查是否超时
 	if timeoutConfig.Enabled && elapsed > timeoutConfig.Threshold {
 		// 获取 Redis 客户端并检查是否需要发送告警
-		if redis:= redisClient;redis != nil {
+		if redis := WrapRedis(ctx, "default"); redis != nil {
 			key := "alarm:timeout:" + ctx.Request.URL.Path
 			// 尝试设置告警标记，5分钟内不重复
 			if ok, _ := redis.SetNX(ctx, key, 1, 5*time.Minute).Result(); ok {

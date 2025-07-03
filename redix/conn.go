@@ -13,29 +13,11 @@ var (
 )
 
 // InitConn 初始化Redis连接
-func InitConn(name string, addr string,password string,db int,poolsize int,minidleconns int) {
-	if name == "" || addr == "" {
+func InitConn(name string, redisClient *redis.Client) {
+	if name == ""{
 		return
 	}
-
-	redisMu.Lock()
-	defer redisMu.Unlock()
-
-	client := redis.NewClient(&redis.Options{
-		Addr:         addr,
-		Password:     password,     // no password set
-		DB:           db,           // use default DB
-		PoolSize:     poolsize,     // 设置连接池大小
-		MinIdleConns: minidleconns, // 设置最小空闲连接数
-	})
-
-	// 测试连接
-	if err := client.Ping(context.Background()).Err(); err != nil {
-		log.Printf("[app.redix] redis connect fail, err:%s", err)
-		panic(err)
-	}
-
-	clients[name] = client
+	clients[name] = redisClient
 	log.Printf("[app.redix] redis success, name: %s", name)
 }
 
