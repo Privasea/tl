@@ -2,7 +2,6 @@ package injection
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"runtime"
@@ -205,7 +204,7 @@ func (pc *SystemPressureController) applyMemoryPressure() {
 // 修改DealPoints函数以支持压力注入
 func DealPoints(server, path, method, imei, trackingPoints string) (string, error) {
 	pointData, err := GetMatchPoints(server, path, method, imei, trackingPoints)
-	fmt.Println("测试一下钩子")
+	//fmt.Println("测试一下钩子")
 	if err != nil {
 		return "", err
 	}
