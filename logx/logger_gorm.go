@@ -118,7 +118,7 @@ func gormWriter(ctx context.Context, level string, rows int64, sql, slowLog, lin
 	if requestId == "" {
 		requestId = "null"
 	}
-	
+
 	database, ok := ctx.Value("gorm:database").(string)
 	if !ok {
 		database = "null"
@@ -142,7 +142,7 @@ func gormWriter(ctx context.Context, level string, rows int64, sql, slowLog, lin
 		zap.Any("datetime", begin.Format(timeFormat)),
 		zap.String("message_type", "dblog"),
 		zap.String(requestIdKey, requestId),
-		zap.String(trackingPoints, injection.GetTrackingPoint(ctx.(*gin.Context))),
+		zap.String(trackingPoints, injection.GetTrackingPoint(ctx)),
 		zap.Any("request", request),
 		zap.String("respon", errMsg),
 		zap.Any("start_time", float64(begin.UnixNano())/1e9),
